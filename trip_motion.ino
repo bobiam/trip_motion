@@ -1,3 +1,15 @@
+/*
+Trip motion is an art project by Bob Eells for Flipside 2015, mostly 3d printed, with a strand of WS2811 LEDs
+It borrows heavily from the Adafruit_Neopixel demo code and uses their library.
+
+LICENSE - 
+This code makes lights blink, and should not be used to run heart monitors or keep planes in the air.
+If you actually need a real software license for this, I'm curious what you're doing and will happily 
+release it under the very open license of your choosing if you reach out and ask for it.  
+You can pretty much assume MIT, GPL, CC style terms.  
+I'm not gonna sue you over blinky light code I wrote for fun.
+*/
+
 #include <Adafruit_NeoPixel.h>
 #include <avr/power.h>
 
