@@ -29,6 +29,28 @@ int rs[numLEDs];
 int gs[numLEDs];
 int bs[numLEDs];
 
+//frequently used named colors
+uint32_t orangered = Color(255,69,0);
+uint32_t orange = Color(255,165,0);
+uint32_t black = Color(0,0,0);
+uint32_t red = Color(255,0,0);
+uint32_t green = Color(0,255,0);
+uint32_t blue = Color(0,0,255);
+uint32_t yellow = Color(255,255,0);
+uint32_t seagreen = Color(84,255,159);
+uint32_t indigo = Color(75,0,130);
+uint32_t violet = Color(238,130,238);
+uint32_t white = Color(255,255,255);
+uint32_t darkgreen = Color(0,255,0);
+uint32_t forestgreen = Color(34,255,34);
+uint32_t darkslategray = Color(47,255,79);
+uint32_t darkolivegreen = Color(85,255,47);
+uint32_t shipcove = Color(115,138,189);
+uint32_t poloblue = Color(118,149,200);
+uint32_t deepblue = Color(0,11,76);
+//doyoubelieveinmagic?
+uint32_t dybim = white+1;
+
 int delayer;
 
 // Set the first variable to the NUMBER of pixels. 25 = 25 pixels in a row
@@ -56,6 +78,24 @@ void setup() {
 
 void loop() {
 
+  all(white);
+  delay(2000);
+  fract(Color(255,0,0),Color(0,255,0),500);  
+  ants(blue, yellow,50);
+  randommy();
+  omgp();
+  accel_chase(darkgreen,black,30);  
+  rand(5000,10,2);
+  //impossible colors:
+  //  red/green
+  // black/white
+  fract(Color(0,0,0),Color(255,255,255),500);    
+  // blue/yellow
+  fract(Color(0,0,255),Color(255,255,0),500);      
+  rand(5000,20,3);
+  chase(blue,red,20);
+  rand(5000,5,1);
+  rand(5000,1,0);  
   fract(Color(255,0,0),Color(0,0,255),500);
   for(int i=2;i<50;i=i*i)
   {
@@ -63,6 +103,116 @@ void loop() {
   }
   trip_motion();
   
+}
+
+int randommy()
+{
+  for(int i=0;i<random(150,500);i++)
+  {
+    strip.setPixelColor(random(0,strip.numPixels()),randomColor());
+    delay(random(0,200));  
+    strip.show();
+  }
+}
+
+int omgp()
+{
+  int i,j,k;
+  int pos; //cheap/easy rollover
+
+  for(k=0;k<50;k++)
+  {
+    for(i=0;i<17;i++)
+    {
+      for(j=0;j<3;j++)
+      {
+        pos = i * 3 * k;
+        while(pos > 255)
+        {
+          pos = pos - 255;
+        }
+        strip.setPixelColor(i*3+j,Wheel(pos));
+      }
+    }
+    strip.show();
+    delay(500);
+  }
+} 
+
+void chase(uint32_t fg, uint32_t bg, int wait)
+{
+  int i,j;
+  for(j=0;j<100;j++)
+  {
+    all(bg);
+    for(i=0;i<numLEDs;i++)
+    {
+      strip.setPixelColor(i,fg);
+      strip.setPixelColor(i-1,bg);
+      strip.show();
+      delay(wait);        
+    }
+    for(i=numLEDs;i>-1;i--)
+    {
+      all(bg);
+      strip.setPixelColor(i,fg);
+      strip.show();
+      delay(wait);        
+    }
+  }    
+}
+
+void accel_chase(uint32_t fg, uint32_t bg, int init_wait)
+{
+  int i,j, wait;
+  wait = init_wait;
+  for(j=0;j<22;j++)
+  {
+    all(bg);
+    for(i=0;i<numLEDs;i++)
+    {
+      strip.setPixelColor(i,fg);
+      strip.setPixelColor(i-1,bg);
+      strip.show();
+      delay(wait);        
+    }
+    for(i=numLEDs;i>-1;i--)
+    {
+      strip.setPixelColor(i,fg);
+      strip.setPixelColor(i+1,bg);
+      strip.show();
+      delay(wait);        
+    }
+    wait = .90 * wait;
+  }    
+}
+
+//does random stuff.  
+void rand(int loops, int max_wait, int modus)
+{
+  int p;
+  uint32_t c;
+  for(int i=0;i<loops;i++)
+  {
+    p = random(0,numLEDs);
+    switch(modus){
+      case 0:
+        c = Color(random(0,255),random(0,255),random(0,255));
+        break;
+      case 1:
+        c = Color(random(0,255),0,0);
+        break;
+      case 2:
+        c = Color(0,random(0,255),0);
+        break;
+      case 3:
+        c = Color(0,0,random(0,255));        
+        break;
+    }
+    strip.setPixelColor(p,c);
+    strip.show();
+    delay(random(0,max_wait));
+  }
 }
 
 void fract(uint32_t c1, uint32_t c2, int wait)
@@ -155,6 +305,128 @@ void trip_motion(){
     strip.show();   // write all the pixels out  
     
     delay(delayer);
+  }
+}
+
+
+//BE - alternate pods between two colors
+int ants(uint32_t c1, uint32_t c2, uint8_t wait){
+  int i,j;
+  for(j=0;j<6;j++)
+  {
+    for(i=0; i< strip.numPixels(); i++)
+    {
+      if(j%2)
+      {     
+        if(i % 2)
+        {
+          strip.setPixelColor(i,c1);
+        }else{
+          strip.setPixelColor(i,c2);
+        }
+      }else{
+        if((i+1) % 2)
+        {
+          strip.setPixelColor(i,c1);
+        }else{
+          strip.setPixelColor(i,c2);
+        }
+      }
+    }
+    strip.show();
+    delay(wait);
+
+  }
+}
+
+int rainbow(uint8_t wait) {
+  int i, j;
+   
+  for (j=0; j < 256; j++) {     // 3 cycles of all 256 colors in the wheel
+    for (i=0; i < strip.numPixels(); i++) {
+      strip.setPixelColor(i, Wheel( (i + j) % 255));
+    }  
+    strip.show();   // write all the pixels out
+    delay(wait);
+
+  }
+}
+// Slightly different, this one makes the rainbow wheel equally distributed 
+// along the chain
+int rainbowCycle(uint8_t wait) {
+  int i, j;
+  
+  for (j=0; j < 256 * 5; j++) {     // 5 cycles of all 25 colors in the wheel
+    for (i=0; i < strip.numPixels(); i++) {
+      // tricky math! we use each pixel as a fraction of the full 96-color wheel
+      // (thats the i / strip.numPixels() part)
+      // Then add in j which makes the colors go around per pixel
+      // the % 96 is to make the wheel cycle around
+      strip.setPixelColor(i, Wheel( ((i * 256 / strip.numPixels()) + j) % 256) );
+    }  
+    strip.show();   // write all the pixels out
+    delay(wait);
+    
+  }
+}
+
+// BE
+// fill the dots one after the other with said color
+// good for testing purposes and color wipes inbetween patterns.
+void colorWipe(uint32_t c, uint8_t wait) {
+  int i;
+  
+  for (i=0; i < strip.numPixels(); i++) {
+      strip.setPixelColor(i, c);
+      strip.show();
+      delay(wait);
+  }
+}
+
+int paletteRand(uint32_t colors[], int colorCount,int maxWait, int loops)
+{
+  for(int j = 0; j < loops; j++)
+  {
+    for(int i =0; i < strip.numPixels();i++)
+    {
+      strip.setPixelColor(i,colors[random(0,colorCount)]);
+    }
+    strip.show();
+    delay(random(0,maxWait));
+
+  }
+}
+
+
+/* Helper functions */
+
+//BE
+uint32_t randomColor()
+{
+  //generate a random color
+  int r = random(0,256);
+  int g = random(0,256);
+  int b = random(0,256);
+  return Color(r,g,b);
+}
+
+//BE 
+void array_spin(byte arr[], int count)
+{
+  byte tmp = arr[0];
+  for(int i=0;i<count-1;i++)
+  {
+    arr[i] = arr[i+1];
+  }
+  arr[count-1] = tmp;
+}
+
+void all(uint32_t c)
+{
+  for(int i=0;i<numLEDs;i++)
+  {
+    strip.setPixelColor(i,c);
+    strip.show();
   }
 }
 
