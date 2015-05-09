@@ -17,8 +17,7 @@ I'm not gonna sue you over blinky light code I wrote for fun.
 #define pirg 3
 #define pirb 8
 
-#define numLEDs 50
-#define init_delay 20
+#define numLEDs 54
 
 //strip data pin
 #define PIN 6
@@ -51,8 +50,6 @@ uint32_t deepblue = Color(0,11,76);
 //doyoubelieveinmagic?
 uint32_t dybim = white+1;
 
-int delayer;
-
 // Set the first variable to the NUMBER of pixels. 25 = 25 pixels in a row
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(numLEDs, PIN, NEO_RGB + NEO_KHZ800);
 
@@ -65,6 +62,7 @@ void setup() {
   pinMode(pirg, INPUT);
   pinMode(pirb, INPUT);  
   
+  //initialize trip_motion array
   for(int i = 0; i<numLEDs; i++)
   {
     rs[i] = 0;
@@ -73,36 +71,80 @@ void setup() {
   }
   // Update LED contents, to start they are all 'off'
   strip.show();
-}
-
-
-void loop() {
-
   all(white);
   delay(2000);
-  fract(Color(255,0,0),Color(0,255,0),500);  
-  ants(blue, yellow,50);
-  randommy();
-  omgp();
-  accel_chase(darkgreen,black,30);  
-  rand(5000,10,2);
-  //impossible colors:
-  //  red/green
-  // black/white
-  fract(Color(0,0,0),Color(255,255,255),500);    
-  // blue/yellow
-  fract(Color(0,0,255),Color(255,255,0),500);      
-  rand(5000,20,3);
-  chase(blue,red,20);
-  rand(5000,5,1);
-  rand(5000,1,0);  
-  fract(Color(255,0,0),Color(0,0,255),500);
-  for(int i=2;i<50;i=i*i)
-  {
-    theaterChaseRainbow(i);  
-  }
-  trip_motion();
+    
+}
+
+void loop() {
   
+  int polled = poll();
+  if(polled == 999)
+  {
+    trip_motion();
+  }else{
+    no_one_close();
+  }
+}
+
+int no_one_close()
+{
+  int polled;
+  polled = nchase(red,green,6,50);
+  if(polled == 999)
+    return 999;
+
+  polled = omgp();
+  if(polled = 999)
+    return 999;
+    
+  polled = ants(blue, yellow,250,500);  
+  if(polled = 999)
+    return 999;
+    
+  polled = accel_chase(darkgreen,black,30);  
+  if(polled = 999)
+    return 999;  
+    
+  polled = fract(Color(255,0,0),Color(0,255,0),500);  
+  if(polled = 999)
+    return 999;  
+    
+  polled = rand(5000,10,2);
+  if(polled = 999)
+    return 999;  
+  
+  polled = randommy();
+  if(polled = 999)
+    return 999;   
+
+  polled = chase(blue,red,20);
+  if(polled = 999)
+    return 999;  
+    
+  polled = theaterChaseRainbow(50);  
+  if(polled = 999)
+    return 999;  
+}
+
+int nchase(uint32_t bg,uint32_t fg,int n,int wait)
+{
+  int p;
+  all(bg);
+  for(int j=0;j<(numLEDs/n);j++)
+  {
+    for(int i=0;i<numLEDs/n;i++)
+    {
+      p = (n*i)+j;
+      if(p>numLEDs)
+        p = p-numLEDs;
+      strip.setPixelColor(p,fg);
+      strip.show();
+      delay(wait);
+      if(poll()==999)
+        return 999;
+    }
+  }
 }
 
 int randommy()
@@ -112,6 +154,8 @@ int randommy()
     strip.setPixelColor(random(0,strip.numPixels()),randomColor());
     delay(random(0,200));  
     strip.show();
+    if(poll()==999)
+      return 999;    
   }
 }
 
@@ -120,9 +164,9 @@ int omgp()
   int i,j,k;
   int pos; //cheap/easy rollover
 
-  for(k=0;k<50;k++)
+  for(k=0;k<numLEDs;k++)
   {
-    for(i=0;i<17;i++)
+    for(i=0;i<(numLEDs/3);i++)
     {
       for(j=0;j<3;j++)
       {
@@ -135,11 +179,13 @@ int omgp()
       }
     }
     strip.show();
+    if(poll()==999)
+      return 999;    
     delay(500);
   }
 } 
 
-void chase(uint32_t fg, uint32_t bg, int wait)
+int chase(uint32_t fg, uint32_t bg, int wait)
 {
   int i,j;
   for(j=0;j<100;j++)
@@ -151,18 +197,22 @@ void chase(uint32_t fg, uint32_t bg, int wait)
       strip.setPixelColor(i-1,bg);
       strip.show();
       delay(wait);        
+      if(poll()==999)
+        return 999;      
     }
     for(i=numLEDs;i>-1;i--)
     {
       all(bg);
       strip.setPixelColor(i,fg);
       strip.show();
-      delay(wait);        
+      delay(wait);  
+      if(poll()==999)
+        return 999;      
     }
   }    
 }
 
-void accel_chase(uint32_t fg, uint32_t bg, int init_wait)
+int accel_chase(uint32_t fg, uint32_t bg, int init_wait)
 {
   int i,j, wait;
   wait = init_wait;
@@ -175,6 +225,8 @@ void accel_chase(uint32_t fg, uint32_t bg, int init_wait)
       strip.setPixelColor(i-1,bg);
       strip.show();
       delay(wait);        
+      if(poll()==999)
+        return 999;      
     }
     for(i=numLEDs;i>-1;i--)
     {
@@ -182,13 +234,15 @@ void accel_chase(uint32_t fg, uint32_t bg, int init_wait)
       strip.setPixelColor(i+1,bg);
       strip.show();
       delay(wait);        
+      if(poll()==999)
+        return 999;      
     }
     wait = .90 * wait;
   }    
 }
 
 //does random stuff.  
-void rand(int loops, int max_wait, int modus)
+int rand(int loops, int max_wait, int modus)
 {
   int p;
   uint32_t c;
@@ -212,19 +266,26 @@ void rand(int loops, int max_wait, int modus)
     strip.setPixelColor(p,c);
     strip.show();
     delay(random(0,max_wait));
+    if(poll()==999)
+      return 999;    
   }
 }
 
-void fract(uint32_t c1, uint32_t c2, int wait)
+int fract(uint32_t c1, uint32_t c2, int wait)
 {
-  fract_segments(c1,c2,25,wait);    
-  fract_segments(c1,c2,12,wait);    
-  fract_segments(c1,c2,6,wait);      
-  fract_segments(c1,c2,3,wait);  
-  fract_segments(c1,c2,1,wait);      
+  if(fract_segments(c1,c2,25,wait) == 999)
+    return 999;  
+  if(fract_segments(c1,c2,12,wait) == 999)
+    return 999;  
+  if(fract_segments(c1,c2,6,wait) == 999)
+    return 999;  
+  if(fract_segments(c1,c2,3,wait) == 999)
+    return 999;  
+  if(fract_segments(c1,c2,1,wait) == 999)
+    return 999;  
 }
 
-void fract_segments(uint32_t c1,uint32_t c2,int segment_size, int wait)
+int fract_segments(uint32_t c1,uint32_t c2,int segment_size, int wait)
 {
   for(int j=1;j<150;j++)
   {
@@ -250,13 +311,19 @@ void fract_segments(uint32_t c1,uint32_t c2,int segment_size, int wait)
     strip.show();
     delay(wait);  
     wait = wait * .95;        
+    if(poll()==999)
+      return 999;    
   }
 }
 
 
 void trip_motion(){
-  uint32_t loops = 0; 
-  while(true){
+  int t_loops = 0; 
+  int delayer;
+  delayer = 25;
+
+  //we want this to play with people as long as they're around, at 25ms, it takes 40 loops to hit a second.  If we've been dark 60 seconds, kick back out to the patterns.
+  while(t_loops<600){
     int r = digitalRead(pirr);
     int g = digitalRead(pirg);
     int b = digitalRead(pirb);
@@ -268,13 +335,15 @@ void trip_motion(){
       bs[j] = bs[j-1];      
       strip.setPixelColor(j, Color(rs[j],gs[j],bs[j]));
     }
+
+    if(r || g || b)
+    {
+      //reset t_loops, something moved.
+      t_loops = 0;
+    }
     
-    delayer = init_delay;
-        
     if(r)
     {
-      Serial.print("Rs[0] is ");
-      Serial.println(rs[0]);
       rs[0] = 255;
       //delayer = init_delay;
     }else{
@@ -296,23 +365,17 @@ void trip_motion(){
     }
 
     strip.setPixelColor(0, Color(rs[0], gs[0], bs[0]));
-    Serial.print(rs[0]);
-    Serial.print(", ");
-    Serial.print(gs[0]);
-    Serial.print(", ");
-    Serial.println(bs[0]);
-    
     strip.show();   // write all the pixels out  
-    
     delay(delayer);
+    t_loops++;
   }
 }
 
 
 //BE - alternate pods between two colors
-int ants(uint32_t c1, uint32_t c2, uint8_t wait){
+int ants(uint32_t c1, uint32_t c2, uint8_t wait, int loops){
   int i,j;
-  for(j=0;j<6;j++)
+  for(j=0;j<loops;j++)
   {
     for(i=0; i< strip.numPixels(); i++)
     {
@@ -335,7 +398,8 @@ int ants(uint32_t c1, uint32_t c2, uint8_t wait){
     }
     strip.show();
     delay(wait);
-
+    if(poll() == 999)
+      return 999;      
   }
 }
 
@@ -348,6 +412,8 @@ int rainbow(uint8_t wait) {
     }  
     strip.show();   // write all the pixels out
     delay(wait);
+    if(poll() == 999)
+      return 999;  
 
   }
 }
@@ -366,20 +432,23 @@ int rainbowCycle(uint8_t wait) {
     }  
     strip.show();   // write all the pixels out
     delay(wait);
-    
+    if(poll() == 999)
+      return 999;      
   }
 }
 
 // BE
 // fill the dots one after the other with said color
 // good for testing purposes and color wipes inbetween patterns.
-void colorWipe(uint32_t c, uint8_t wait) {
+int colorWipe(uint32_t c, uint8_t wait) {
   int i;
   
   for (i=0; i < strip.numPixels(); i++) {
       strip.setPixelColor(i, c);
       strip.show();
       delay(wait);
+      if(poll() == 999)
+        return 999;        
   }
 }
 
@@ -393,12 +462,24 @@ int paletteRand(uint32_t colors[], int colorCount,int maxWait, int loops)
     }
     strip.show();
     delay(random(0,maxWait));
-
+    if(poll() == 999)
+      return 999;  
   }
 }
 
 
 /* Helper functions */
+
+int poll()
+{
+  int r = digitalRead(pirr);
+  int g = digitalRead(pirg);
+  int b = digitalRead(pirb);
+  if(r || g || b)
+  {
+    return 999;
+  }
+}
 
 //BE
 uint32_t randomColor()
@@ -458,7 +539,7 @@ uint32_t Wheel(byte WheelPos) {
 }
 
 //Theatre-style crawling lights with rainbow effect
-void theaterChaseRainbow(uint8_t wait) {
+int theaterChaseRainbow(uint8_t wait) {
   for (int j=0; j < 256; j++) {     // cycle all 256 colors in the wheel
     for (int q=0; q < 3; q++) {
         for (int i=0; i < strip.numPixels(); i=i+3) {
