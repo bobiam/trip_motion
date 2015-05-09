@@ -89,7 +89,7 @@ void loop() {
 int no_one_close()
 {
   int polled;
-  polled = crossfader(red,blue,25);
+  polled = crossfader(white,black,20,true);
   if(polled == 999)
     return 999;
     
@@ -97,40 +97,53 @@ int no_one_close()
   if(polled == 999)
     return 999;
 
+  polled = nchase(green,blue,6,25);
+  if(polled == 999)
+    return 999;
+
+  polled = nchase(blue,red,6,12);
+  if(polled == 999)
+    return 999;
+
+  polled = crossfader(orangered,deepblue,20,false);
+  if(polled == 999)
+    return 999;
+
+  polled = fract(red,green,500);  
+  if(polled == 999)
+    return 999;  
+        
+
   polled = omgp();
-  if(polled = 999)
+  if(polled == 999)
     return 999;
     
   polled = ants(blue, yellow,250,500);  
-  if(polled = 999)
+  if(polled == 999)
     return 999;
     
   polled = accel_chase(darkgreen,black,30);  
-  if(polled = 999)
+  if(polled == 999)
     return 999;  
     
-  polled = fract(Color(255,0,0),Color(0,255,0),500);  
-  if(polled = 999)
+  polled = fract(red,green,500);  
+  if(polled == 999)
     return 999;  
     
-  polled = rand(5000,10,2);
-  if(polled = 999)
-    return 999;  
-  
   polled = randommy();
-  if(polled = 999)
+  if(polled == 999)
     return 999;   
 
   polled = chase(blue,red,20);
-  if(polled = 999)
+  if(polled == 999)
     return 999;  
     
   polled = theaterChaseRainbow(50);  
-  if(polled = 999)
+  if(polled == 999)
     return 999;  
 }
 
-int crossfader(uint32_t c1, uint32_t c2, int wait)
+int crossfader(uint32_t c1, uint32_t c2, int wait, bool accel)
 {
   byte colors1[3];
   byte colors2[3];
@@ -146,7 +159,7 @@ int crossfader(uint32_t c1, uint32_t c2, int wait)
   delta_r = delta_r / numLEDs;
   delta_g = delta_g / numLEDs;
   delta_b = delta_b / numLEDs;
-  for(int j =0;j<500;j++)
+  for(int j =0;j<1000;j++)
   {
     for(int i=0;i<numLEDs;i++)
     {
@@ -156,8 +169,10 @@ int crossfader(uint32_t c1, uint32_t c2, int wait)
       pixel = (i + j) % numLEDs;
       strip.setPixelColor(pixel,Color(red,green,blue));
     }
-    strip.show();
+    strip.show();    
     delay(wait);
+    if(accel)
+      wait = wait * 0.99;
     if(poll() == 999)
       return 999;  
   } 
@@ -520,18 +535,6 @@ void decodeColor(uint32_t c, byte ret[])
   ret[2] = b;  
 }
 
-//poll the motion sensors, kick out a 999 if one trips, which kicks us to triple motion (trip_motion())
-int poll()
-{
-  int r = digitalRead(pirr);
-  int g = digitalRead(pirg);
-  int b = digitalRead(pirb);
-  if(r || g || b)
-  {
-    return 999;
-  }
-}
-
 //BE
 uint32_t randomColor()
 {
@@ -604,5 +607,17 @@ int theaterChaseRainbow(uint8_t wait) {
           strip.setPixelColor(i+q, 0);        //turn every third pixel off
         }
     }
+  }
+}
+
+//poll the motion sensors, kick out a 999 if one trips, which kicks us to triple motion (trip_motion())
+int poll()
+{
+  int r = digitalRead(pirr);
+  int g = digitalRead(pirg);
+  int b = digitalRead(pirb);
+  if(r || g || b)
+  {
+    return 998;
   }
 }
