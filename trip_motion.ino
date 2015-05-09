@@ -57,7 +57,6 @@ void setup() {
     
   strip.begin();
   Serial.begin(9600);
-  
   pinMode(pirr, INPUT);
   pinMode(pirg, INPUT);
   pinMode(pirb, INPUT);  
@@ -90,6 +89,10 @@ void loop() {
 int no_one_close()
 {
   int polled;
+  polled = crossfader(red,blue,25);
+  if(polled == 999)
+    return 999;
+    
   polled = nchase(red,green,6,50);
   if(polled == 999)
     return 999;
@@ -125,6 +128,39 @@ int no_one_close()
   polled = theaterChaseRainbow(50);  
   if(polled = 999)
     return 999;  
+}
+
+int crossfader(uint32_t c1, uint32_t c2, int wait)
+{
+  byte colors1[3];
+  byte colors2[3];
+  int pixel;
+  decodeColor(c1,colors1);
+  decodeColor(c2,colors2);
+  float delta_r, delta_g, delta_b, red, green, blue;
+
+  delta_r = colors2[0] - colors1[0];
+  delta_g = colors2[1] - colors1[1];
+  delta_b = colors2[2] - colors1[2];
+  
+  delta_r = delta_r / numLEDs;
+  delta_g = delta_g / numLEDs;
+  delta_b = delta_b / numLEDs;
+  for(int j =0;j<500;j++)
+  {
+    for(int i=0;i<numLEDs;i++)
+    {
+      red = colors1[0]+(i*delta_r);
+      green = colors1[1]+(i*delta_g);
+      blue = colors1[2]+(i*delta_b);
+      pixel = (i + j) % numLEDs;
+      strip.setPixelColor(pixel,Color(red,green,blue));
+    }
+    strip.show();
+    delay(wait);
+    if(poll() == 999)
+      return 999;  
+  } 
 }
 
 int nchase(uint32_t bg,uint32_t fg,int n,int wait)
@@ -470,6 +506,21 @@ int paletteRand(uint32_t colors[], int colorCount,int maxWait, int loops)
 
 /* Helper functions */
 
+//BE - sometimes it's useful to get the RGB values back when passing colors to and fro.
+void decodeColor(uint32_t c, byte ret[])
+{
+  int r,g,b;
+  
+  b = c & 255;
+  g = c >>= 8;
+  r = c >> 8;
+  
+  ret[0] = r;
+  ret[1] = g;
+  ret[2] = b;  
+}
+
+//poll the motion sensors, kick out a 999 if one trips, which kicks us to triple motion (trip_motion())
 int poll()
 {
   int r = digitalRead(pirr);
