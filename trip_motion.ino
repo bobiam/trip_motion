@@ -79,11 +79,6 @@ void setup() {
     delay(2000);
   }  
 }
-
-void bob_debug() {
-  
-}
-
 void loop() {
   if(debug)
   {
@@ -102,6 +97,10 @@ void loop() {
 int no_one_close()
 {
   int polled;
+  
+  polled = comet(black, green, 10, 100, 50);
+  if(polled == 999)
+    return 999;
   
   polled = fades(1,10);
   if(polled == 999)
@@ -191,6 +190,59 @@ int no_one_close()
   if(polled == 999)
     return 999;  
     
+  return 1;
+}
+
+void bob_debug() {
+  
+}
+
+int comet(uint32_t bg, uint32_t tail_color, int tail_length, int wait, int loops)
+{
+  all(bg);
+  for(int i=0;i<loops;i++)
+  {
+    for(int j=0;j<numLEDs;j++)
+    {
+      for(int k=0;k<9;k++)
+      {
+        strip.setPixelColor(j,Wheel(k*25));
+        for(int m=0;m<tail_length;m++)
+        {
+          if((j-m) > -1)
+            strip.setPixelColor(j-m,tail_color);
+        }
+        strip.show();
+        delay(1); 
+        strip.setPixelColor(j,white);
+        strip.show();
+        delay(1);         
+      }
+      all(bg);
+      if(poll() == 999)  
+        return 999;
+    }
+    for(int j=numLEDs;j>0;j--)
+    {
+      for(int k=0;k<9;k++)
+      {
+        strip.setPixelColor(j,Wheel(k*25));
+        for(int m=0;m<tail_length;m++)
+        {
+          if((j+m) < numLEDs)
+            strip.setPixelColor(j+m,tail_color);
+        }
+        strip.show();
+        delay(1); 
+        strip.setPixelColor(j,white);
+        strip.show();
+        delay(1);         
+      }
+      all(bg);
+      if(poll() == 999)  
+        return 999;      
+    }    
+  }
   return 1;
 }
 
@@ -292,7 +344,7 @@ int paletteRand(uint32_t colors[], int colorCount,int maxWait, int loops)
 {
   for(int j = 0; j < loops; j++)
   {
-    for(int i =0; i < strip.numPixels();i++)
+    for(int i =0; i < numLEDs;i++)
     {
       strip.setPixelColor(i,colors[random(0,colorCount)]);
       if(poll() == 999)
@@ -429,7 +481,7 @@ int randommy()
 {
   for(int i=0;i<random(150,500);i++)
   {
-    strip.setPixelColor(random(0,strip.numPixels()),randomColor());
+    strip.setPixelColor(random(0,numLEDs),randomColor());
     delay(random(0,200));  
     strip.show();
     if(poll()==999)
@@ -528,6 +580,7 @@ int rand(int loops, int max_wait, int modus)
 {
   int p;
   uint32_t c;
+  c = black;
   for(int i=0;i<loops;i++)
   {
     p = random(0,numLEDs);
@@ -662,7 +715,7 @@ int ants(uint32_t c1, uint32_t c2, uint8_t wait, int loops){
   int i,j;
   for(j=0;j<loops;j++)
   {
-    for(i=0; i< strip.numPixels(); i++)
+    for(i=0; i< numLEDs; i++)
     {
       if(j%2)
       {     
@@ -693,7 +746,7 @@ int rainbow(uint8_t wait) {
   int i, j;
    
   for (j=0; j < 256; j++) {     // 3 cycles of all 256 colors in the wheel
-    for (i=0; i < strip.numPixels(); i++) {
+    for (i=0; i < numLEDs; i++) {
       strip.setPixelColor(i, Wheel( (i + j) % 255));
     }  
     strip.show();   // write all the pixels out
@@ -709,12 +762,12 @@ int rainbowCycle(uint8_t wait) {
   int i, j;
   
   for (j=0; j < 256 * 5; j++) {     // 5 cycles of all 25 colors in the wheel
-    for (i=0; i < strip.numPixels(); i++) {
+    for (i=0; i < numLEDs; i++) {
       // tricky math! we use each pixel as a fraction of the full 96-color wheel
-      // (thats the i / strip.numPixels() part)
+      // (thats the i / numLEDs part)
       // Then add in j which makes the colors go around per pixel
       // the % 96 is to make the wheel cycle around
-      strip.setPixelColor(i, Wheel( ((i * 256 / strip.numPixels()) + j) % 256) );
+      strip.setPixelColor(i, Wheel( ((i * 256 / numLEDs) + j) % 256) );
     }  
     strip.show();   // write all the pixels out
     delay(wait);
@@ -730,7 +783,7 @@ int rainbowCycle(uint8_t wait) {
 int colorWipe(uint32_t c, uint8_t wait) {
   int i;
   
-  for (i=0; i < strip.numPixels(); i++) {
+  for (i=0; i < numLEDs; i++) {
       strip.setPixelColor(i, c);
       strip.show();
       delay(wait);
@@ -843,7 +896,7 @@ int poll()
   int b = digitalRead(pirb);
   if(r || g || b)
   {
-    return 998;
+    return 999;
   }
   return 1;
 }
