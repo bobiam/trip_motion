@@ -36,6 +36,7 @@ uint32_t red = Color(255,0,0);
 uint32_t green = Color(0,255,0);
 uint32_t blue = Color(0,0,255);
 uint32_t yellow = Color(255,255,0);
+uint32_t purple = Color(255,0,255);
 uint32_t seagreen = Color(84,255,159);
 uint32_t indigo = Color(75,0,130);
 uint32_t violet = Color(238,130,238);
@@ -49,6 +50,8 @@ uint32_t poloblue = Color(118,149,200);
 uint32_t deepblue = Color(0,11,76);
 //doyoubelieveinmagic?
 uint32_t dybim = white+1;
+
+bool debug = false;
 
 // Set the first variable to the NUMBER of pixels. 25 = 25 pixels in a row
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(numLEDs, PIN, NEO_RGB + NEO_KHZ800);
@@ -70,46 +73,64 @@ void setup() {
   }
   // Update LED contents, to start they are all 'off'
   strip.show();
-  all(white);
-  delay(2000);
-    
+  if(!debug)
+  {
+    all(white);
+    delay(2000);
+  }  
+}
+
+void bob_debug() {
+  
 }
 
 void loop() {
-  
-  int polled = poll();
-  if(polled == 999)
+  if(debug)
   {
-    trip_motion();
+    bob_debug();
   }else{
-    no_one_close();
+    int polled = poll();
+    if(polled == 999 && !debug)
+    {
+      trip_motion();
+    }else{
+      no_one_close();
+    }
   }
 }
 
 int no_one_close()
 {
   int polled;
+  
+  polled = fades(1,10);
+  if(polled == 999)
+    return 999;
+  
+  polled =  cross_the_streams(black,blue,red,10,10);
+  if(polled == 999)
+    return 999;
+    
+  polled = bouncy(black,dybim,10,30);
+  if(polled == 999)
+    return 999;
 
   polled = earthRand(200);
   if(polled == 999)
     return 999;
 
-  polled = airRand(200);
+  polled = airRand(150);
   if(polled == 999)
     return 999;
 
-  polled = fireRand(200);
+  polled = fireRand(100);
   if(polled == 999)
     return 999;
     
-  polled = waterRand(200);
+  polled = waterRand(50);
   if(polled == 999)
     return 999;
     
-  polled = nchase(red,green,6,50);
-  if(polled == 999)
-    return 999;    
-      
   polled = nchase(red,green,6,50);
   if(polled == 999)
     return 999;
@@ -122,7 +143,7 @@ int no_one_close()
   if(polled == 999)
     return 999;  
 
-  polled = bouncy(black,blue,250);
+  polled = bouncy(black,blue,10,50);
   if(polled == 999)
     return 999;
 
@@ -138,7 +159,6 @@ int no_one_close()
   if(polled == 999)
     return 999;
 
-
   polled = crossfader(orangered,deepblue,20,false);
   if(polled == 999)
     return 999;
@@ -147,7 +167,6 @@ int no_one_close()
   if(polled == 999)
     return 999;  
         
-
   polled = omgp();
   if(polled == 999)
     return 999;
@@ -171,8 +190,59 @@ int no_one_close()
   polled = theaterChaseRainbow(50);  
   if(polled == 999)
     return 999;  
+    
+  return 1;
 }
 
+int fades(int wait, int loops)
+{
+  for(int j=0;j<loops;j++)
+  {
+    for(int i=0;i<255;i++)
+    {
+        all(Color(i,0,0));
+        delay(wait);
+        if(poll() == 999)
+          return 999;
+    }
+    for(int i=255;i>0;i--)
+    {
+        all(Color(i,0,0));
+        delay(wait);
+        if(poll() == 999)
+          return 999;
+    }    
+    for(int i=0;i<255;i++)
+    {
+        all(Color(0,0,i));
+        delay(wait);
+        if(poll() == 999)
+          return 999;
+    }
+    for(int i=255;i>0;i--)
+    {
+        all(Color(0,0,i));
+        delay(wait);
+        if(poll() == 999)
+          return 999;
+    }    
+    for(int i=0;i<255;i++)
+    {
+        all(Color(0,i,0));
+        delay(wait);
+        if(poll() == 999)
+          return 999;
+    }
+    for(int i=255;i>0;i--)
+    {
+        all(Color(0,i,0));
+        delay(wait);
+        if(poll() == 999)
+          return 999;
+    }        
+  }
+  return 1;
+}
 
 //BE - earth color palette
 int airRand(int loops)
@@ -182,6 +252,7 @@ int airRand(int loops)
   int poll = paletteRand(colors,sizeof(colors)/sizeof(uint32_t),maxWait,loops);
   if(poll == 999)
     return 999;    
+  return 1;
 }
 
 //BE - earth color palette
@@ -192,6 +263,7 @@ int earthRand(int loops)
   int poll = paletteRand(colors,sizeof(colors)/sizeof(uint32_t),maxWait,loops);
   if(poll == 999)
     return 999;  
+  return 1;
 }
 
 //BE - fire color palette
@@ -202,6 +274,7 @@ int fireRand(int loops)
   int poll = paletteRand(colors,sizeof(colors)/sizeof(uint32_t),maxWait,loops);
   if(poll == 999)
     return 999;  
+  return 1;
 }
 
 //BE - water color palette
@@ -212,6 +285,7 @@ int waterRand(int loops)
   int poll = paletteRand(colors,sizeof(colors)/sizeof(uint32_t),maxWait,loops);
   if(poll == 999)
     return 999;  
+  return 1;
 }
 
 int paletteRand(uint32_t colors[], int colorCount,int maxWait, int loops)
@@ -227,16 +301,49 @@ int paletteRand(uint32_t colors[], int colorCount,int maxWait, int loops)
     strip.show();
     delay(maxWait);    
   }
+  return 1;
 }
 
-int bouncy(uint32_t c1, uint32_t c2, int init_wait)
+//cross the streams
+//sets ring to bc, runs a pod from each end (fgc1, fgc2), they overwrite each other as they cross.
+//duration = loops * wait * numLEDs
+int cross_the_streams(uint32_t bc, uint32_t fgc1, uint32_t fgc2, int wait, int loops)
+{
+  all(bc);
+  for(int j=0;j<loops;j++)
+  {
+    for(int i=0;i<numLEDs+1;i++)
+    {
+      strip.setPixelColor(i,fgc1);
+      strip.setPixelColor(numLEDs-i,fgc2);
+      strip.show();
+      delay(wait);
+      if(poll() == 999)
+        return 999;        
+    }
+  }
+  return 1;
+}
+
+//bouncy
+//sets ring to c1, then takes c2 off the two ends at a decelerating rate
+//duration = init_wait * 
+int bouncy(uint32_t c1, uint32_t c2, int init_wait, int loops)
 {
   int wait;
-  for(int i=0;i<250;i++)
+  bool dybim_flag;
+  int strip_divisor = 2;
+  dybim_flag = false;
+  for(int i=0;i<loops;i++)
   {
+    if(c2 == dybim || dybim_flag )
+    {
+      dybim_flag = true;
+      c2 = Wheel(i);
+    }
     all(c2);
     wait = init_wait;
-    for(int j=0;j<numLEDs/3;j++)
+    for(int j=0;j<numLEDs/strip_divisor;j++)
     {
       strip.setPixelColor(j,c1);
       strip.setPixelColor(numLEDs-1-j,c1);
@@ -244,16 +351,21 @@ int bouncy(uint32_t c1, uint32_t c2, int init_wait)
       wait = 1.05 * wait;
       Serial.println(wait);
       delay(wait);
+      if(poll() == 999)
+        return 999;        
     }
-    for(int j=numLEDs/3;j>-1;j--)
+    for(int j=numLEDs/strip_divisor;j>-1;j--)
     {
       strip.setPixelColor(j,c2);
       strip.setPixelColor(numLEDs-1-j,c2);
       strip.show();
       delay(wait);
+      if(poll() == 999)
+        return 999;        
       wait = .1 * wait;
     }    
   }
+  return 1;
 }
 
 int crossfader(uint32_t c1, uint32_t c2, int wait, bool accel)
@@ -289,6 +401,7 @@ int crossfader(uint32_t c1, uint32_t c2, int wait, bool accel)
     if(poll() == 999)
       return 999;  
   } 
+  return 1;
 }
 
 int nchase(uint32_t bg,uint32_t fg,int n,int wait)
@@ -309,6 +422,7 @@ int nchase(uint32_t bg,uint32_t fg,int n,int wait)
         return 999;
     }
   }
+  return 1;
 }
 
 int randommy()
@@ -321,6 +435,7 @@ int randommy()
     if(poll()==999)
       return 999;    
   }
+  return 1;
 }
 
 int omgp()
@@ -347,6 +462,7 @@ int omgp()
       return 999;    
     delay(500);
   }
+  return 1;
 } 
 
 int chase(uint32_t fg, uint32_t bg, int wait)
@@ -374,6 +490,7 @@ int chase(uint32_t fg, uint32_t bg, int wait)
         return 999;      
     }
   }    
+  return 1;
 }
 
 int accel_chase(uint32_t fg, uint32_t bg, int init_wait)
@@ -403,6 +520,7 @@ int accel_chase(uint32_t fg, uint32_t bg, int init_wait)
     }
     wait = .90 * wait;
   }    
+  return 1;
 }
 
 //does random stuff.  
@@ -433,6 +551,7 @@ int rand(int loops, int max_wait, int modus)
     if(poll()==999)
       return 999;    
   }
+  return 1;
 }
 
 int fract(uint32_t c1, uint32_t c2, int wait)
@@ -447,6 +566,7 @@ int fract(uint32_t c1, uint32_t c2, int wait)
     return 999;  
   if(fract_segments(c1,c2,1,wait) == 999)
     return 999;  
+  return 1;
 }
 
 int fract_segments(uint32_t c1,uint32_t c2,int segment_size, int wait)
@@ -478,6 +598,7 @@ int fract_segments(uint32_t c1,uint32_t c2,int segment_size, int wait)
     if(poll()==999)
       return 999;    
   }
+  return 1;
 }
 
 
@@ -565,6 +686,7 @@ int ants(uint32_t c1, uint32_t c2, uint8_t wait, int loops){
     if(poll() == 999)
       return 999;      
   }
+  return 1;
 }
 
 int rainbow(uint8_t wait) {
@@ -578,8 +700,8 @@ int rainbow(uint8_t wait) {
     delay(wait);
     if(poll() == 999)
       return 999;  
-
   }
+  return 1;
 }
 // Slightly different, this one makes the rainbow wheel equally distributed 
 // along the chain
@@ -599,6 +721,7 @@ int rainbowCycle(uint8_t wait) {
     if(poll() == 999)
       return 999;      
   }
+  return 1;  
 }
 
 // BE
@@ -614,6 +737,7 @@ int colorWipe(uint32_t c, uint8_t wait) {
       if(poll() == 999)
         return 999;        
   }
+  return 1;
 }
 
 
@@ -661,8 +785,8 @@ void all(uint32_t c)
   for(int i=0;i<numLEDs;i++)
   {
     strip.setPixelColor(i,c);
-    strip.show();
   }
+  strip.show();  
 }
 
 // Create a 24 bit color value from R,G,B
@@ -696,18 +820,19 @@ uint32_t Wheel(byte WheelPos) {
 int theaterChaseRainbow(uint8_t wait) {
   for (int j=0; j < 256; j++) {     // cycle all 256 colors in the wheel
     for (int q=0; q < 3; q++) {
-        for (int i=0; i < strip.numPixels(); i=i+3) {
+        for (int i=0; i < numLEDs; i=i+3) {
           strip.setPixelColor(i+q, Wheel( (i+j) % 255));    //turn every third pixel on
         }
         strip.show();
        
         delay(wait);
        
-        for (int i=0; i < strip.numPixels(); i=i+3) {
+        for (int i=0; i < numLEDs; i=i+3) {
           strip.setPixelColor(i+q, 0);        //turn every third pixel off
         }
     }
-  }
+  }  
+  return 1;
 }
 
 //poll the motion sensors, kick out a 999 if one trips, which kicks us to triple motion (trip_motion())
@@ -720,4 +845,5 @@ int poll()
   {
     return 998;
   }
+  return 1;
 }
