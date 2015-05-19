@@ -101,6 +101,10 @@ int no_one_close()
   polled = comet(black, green, 10, 100, 50);
   if(polled == 999)
     return 999;
+    
+  polled = chase_fill(black,randomColor(),5,5);  
+  if(polled == 999)
+    return 999;
   
   polled = fades(1,10);
   if(polled == 999)
@@ -142,6 +146,10 @@ int no_one_close()
   if(polled == 999)
     return 999;  
 
+  polled = chase_fill(red,blue,5,9);
+  if(polled == 999)
+    return 999;
+    
   polled = bouncy(black,blue,10,50);
   if(polled == 999)
     return 999;
@@ -169,6 +177,10 @@ int no_one_close()
   polled = omgp();
   if(polled == 999)
     return 999;
+
+  polled = chase_fill(black,red,5,7);
+  if(polled == 999)
+    return 999;
     
   polled = ants(blue, yellow,250,500);  
   if(polled == 999)
@@ -190,11 +202,67 @@ int no_one_close()
   if(polled == 999)
     return 999;  
     
+  polled = chase_fill(black,dybim,5,6);       
+  if(polled == 999)
+    return 999;
+    
   return 1;
 }
 
 void bob_debug() {
-  
+
+}
+
+int chase_fill(uint32_t bg, uint32_t fg, int loops, int wait)
+{
+  //we need to step through numLEdDs+numLEDs-1+numLEDs-2, etc.  Yay for easy formulas.
+  int triangular_number = (numLEDs * (numLEDs + 1)) / 2;
+  int wheel_seed_multiplier = 256 / numLEDs;
+  all(bg);  
+  for(int l=0;l<loops;l++)
+  {
+    int last = numLEDs;      
+    for(int j=0;j<triangular_number;j++)
+    {
+      for(int i=0;i<last;i++)
+      {
+        if(fg == dybim)
+        {
+          strip.setPixelColor(i,Wheel(i * wheel_seed_multiplier));
+        }else{
+          strip.setPixelColor(i,fg);
+        }
+        if(i>0)  
+          strip.setPixelColor(i-1,bg);
+        strip.show();
+        if(poll() == 999)
+          return 999;
+        delay(wait);
+      }
+      last--;    
+    }
+    last = -1;
+    for(int j=0;j<triangular_number;j++)
+    {
+      for(int i=numLEDs;i>last;i--)
+      {
+        if(fg == dybim)
+        {
+          strip.setPixelColor(i,Wheel(i*10));
+        }else{
+          strip.setPixelColor(i,fg);
+        }
+        if(i<numLEDs)  
+          strip.setPixelColor(i+1,bg);
+        strip.show();
+        if(poll() == 999)
+          return 999;
+        delay(wait);
+      }
+      last++;    
+    }    
+  }
+  return 1;
 }
 
 int comet(uint32_t bg, uint32_t tail_color, int tail_length, int wait, int loops)
