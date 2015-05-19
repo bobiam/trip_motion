@@ -114,6 +114,10 @@ int no_one_close()
   if(polled == 999)
     return 999;
     
+  polled = fract(white,black,500);  
+  if(polled == 999)
+    return 999;      
+    
   polled = bouncy(black,dybim,10,30);
   if(polled == 999)
     return 999;
@@ -210,7 +214,7 @@ int no_one_close()
 }
 
 void bob_debug() {
-
+  comet(black, blue, 10, 100, 1);
 }
 
 int chase_fill(uint32_t bg, uint32_t fg, int loops, int wait)
@@ -267,44 +271,40 @@ int chase_fill(uint32_t bg, uint32_t fg, int loops, int wait)
 
 int comet(uint32_t bg, uint32_t tail_color, int tail_length, int wait, int loops)
 {
+  float tail_multiplier = .75;
   all(bg);
   for(int i=0;i<loops;i++)
   {
-    for(int j=0;j<numLEDs;j++)
+    for(int j=0;j<numLEDs+tail_length;j++)
     {
-      for(int k=0;k<9;k++)
+      for(int m=0;m<tail_length;m++)
       {
-        strip.setPixelColor(j,Wheel(k*25));
-        for(int m=0;m<tail_length;m++)
-        {
-          if((j-m) > -1)
-            strip.setPixelColor(j-m,tail_color);
-        }
-        strip.show();
-        delay(1); 
-        strip.setPixelColor(j,white);
-        strip.show();
-        delay(1);         
+        if((j-m) > -1)
+          strip.setPixelColor(j-m,desaturate(tail_color, pow(tail_multiplier,m)));
       }
+      for(int p =0;p<6;p++)
+      {
+        strip.setPixelColor(j,randomColor());
+        strip.show();
+        delay(p+3);     
+      }
+
       all(bg);
       if(poll() == 999)  
         return 999;
     }
-    for(int j=numLEDs;j>0;j--)
+    for(int j=numLEDs;j>0-tail_length;j--)
     {
-      for(int k=0;k<9;k++)
+      for(int m=0;m<tail_length;m++)
       {
-        strip.setPixelColor(j,Wheel(k*25));
-        for(int m=0;m<tail_length;m++)
-        {
-          if((j+m) < numLEDs)
-            strip.setPixelColor(j+m,tail_color);
-        }
+        if((j+m) > -1)
+          strip.setPixelColor(j+m,desaturate(tail_color, pow(tail_multiplier,m)));
+      }
+      for(int p =0;p<6;p++)
+      {
+        strip.setPixelColor(j,randomColor());
         strip.show();
-        delay(1); 
-        strip.setPixelColor(j,white);
-        strip.show();
-        delay(1);         
+        delay(10);     
       }
       all(bg);
       if(poll() == 999)  
@@ -677,11 +677,11 @@ int rand(int loops, int max_wait, int modus)
 
 int fract(uint32_t c1, uint32_t c2, int wait)
 {
-  if(fract_segments(c1,c2,25,wait) == 999)
+  if(fract_segments(c1,c2,27,wait) == 999)
     return 999;  
   if(fract_segments(c1,c2,12,wait) == 999)
     return 999;  
-  if(fract_segments(c1,c2,6,wait) == 999)
+  if(fract_segments(c1,c2,9,wait) == 999)
     return 999;  
   if(fract_segments(c1,c2,3,wait) == 999)
     return 999;  
@@ -954,6 +954,25 @@ int theaterChaseRainbow(uint8_t wait) {
     }
   }  
   return 1;
+}
+
+uint32_t desaturate(uint32_t c, float multiplier)
+{
+  byte ret[3];
+  ret[0] = 0;
+  ret[1] = 0;
+  ret[2] = 0;
+
+  decodeColor(c,ret);
+  
+  byte ret_c_comp[3];
+  ret_c_comp[0] = multiplier * ret[0];
+  ret_c_comp[1] = multiplier * ret[1];
+  ret_c_comp[2] = multiplier * ret[2];  
+  
+  uint32_t ret_c = Color(ret_c_comp[0],ret_c_comp[1],ret_c_comp[2]);
+  
+  return ret_c;
 }
 
 //poll the motion sensors, kick out a 999 if one trips, which kicks us to triple motion (trip_motion())
