@@ -50,6 +50,8 @@ uint32_t poloblue = Color(118,149,200);
 uint32_t deepblue = Color(0,11,76);
 //doyoubelieveinmagic?
 uint32_t dybim = white+1;
+//doyoubelieveinrandom?
+uint32_t dybir = dybim+1;
 
 bool debug = false;
 
@@ -98,123 +100,292 @@ int no_one_close()
 {
   int polled;
   
-  polled = comet(black, green, 10, 100, 50);
+  polled = comet(black, yellow, 2, 1);
   if(polled == 999)
-    return 999;
+    trip_motion();
+
+  polled = comet(black, yellow, 5, 1);
+  if(polled == 999)
+    trip_motion();
     
-  polled = chase_fill(black,randomColor(),5,5);  
+  polled = comet(black, yellow, 15, 1);
   if(polled == 999)
-    return 999;
+    trip_motion();
+    
+  polled = chase_fill(black,red,5,5);  
+  if(polled == 999)
+    trip_motion();
   
-  polled = fades(1,10);
+  polled = fades(0,10);
   if(polled == 999)
-    return 999;
+    trip_motion();
+
+  polled =  cross_the_streams(black,orangered,red,10,10);
+  if(polled == 999)
+    trip_motion();
+
+  polled = fract(blue,yellow,500);  
+  if(polled == 999)
+    trip_motion();      
+
+  polled = bouncy(black,dybir,10,30);
+  if(polled == 999)
+    trip_motion();
+
+  polled = earthRand(10);
+  if(polled == 999)
+    trip_motion();
+
+  polled = airRand(10);
+  if(polled == 999)
+    trip_motion();
+
+  polled = fireRand(10);
+  if(polled == 999)
+    trip_motion();
+    
+  polled = waterRand(10);
+  if(polled == 999)
+    trip_motion();
+
+  polled = chase_fill(blue,black,5,5); 
+  if(polled == 999)
+    trip_motion();
+       
+  polled = nchase(red,green,5,50);
+  if(polled == 999)
+    trip_motion();
+
+  polled = nchase(green,blue,4,25);
+  if(polled == 999)
+    trip_motion();
+
+  polled = nchase(blue,red,5,12);
+  if(polled == 999)
+    trip_motion();  
+       
+  polled = chase_fill(purple,green,5,3);
+  if(polled == 999)
+    trip_motion();
+
+  for(int i=18;i>8;i--)
+  {  
+    polled = bouncy(black,red,i,1);
+    if(polled == 999)
+      trip_motion();
+  }
   
-  polled =  cross_the_streams(black,blue,red,10,10);
-  if(polled == 999)
-    return 999;
-    
-  polled = fract(white,black,500);  
-  if(polled == 999)
-    return 999;      
-    
-  polled = bouncy(black,dybim,10,30);
-  if(polled == 999)
-    return 999;
-
-  polled = earthRand(200);
-  if(polled == 999)
-    return 999;
-
-  polled = airRand(150);
-  if(polled == 999)
-    return 999;
-
-  polled = fireRand(100);
-  if(polled == 999)
-    return 999;
-    
-  polled = waterRand(50);
-  if(polled == 999)
-    return 999;
-    
-  polled = nchase(red,green,6,50);
-  if(polled == 999)
-    return 999;
-
-  polled = nchase(green,blue,6,25);
-  if(polled == 999)
-    return 999;
-
-  polled = nchase(blue,red,6,12);
-  if(polled == 999)
-    return 999;  
-
-  polled = chase_fill(red,blue,5,9);
-  if(polled == 999)
-    return 999;
-    
-  polled = bouncy(black,blue,10,50);
-  if(polled == 999)
-    return 999;
+  for(int i=8;i<18;i++)
+  {  
+    polled = bouncy(black,red,i,1);
+    if(polled == 999)
+      trip_motion();
+  }
 
   polled = rainbow(20);
   if(polled == 999)
-    return 999;
+    trip_motion();
 
   polled = rainbowCycle(20);
   if(polled == 999)
-    return 999;
+    trip_motion();
 
-  polled = crossfader(white,black,20,true);
+  polled = crossfader(purple,blue,20,false);
   if(polled == 999)
-    return 999;
+    trip_motion();
 
   polled = crossfader(orangered,deepblue,20,false);
   if(polled == 999)
-    return 999;
+    trip_motion();
 
   polled = fract(red,green,500);  
   if(polled == 999)
-    return 999;  
+    trip_motion();  
         
   polled = omgp();
   if(polled == 999)
-    return 999;
+    trip_motion();
 
-  polled = chase_fill(black,red,5,7);
+  polled = chase_fill(black,purple,5,7);
   if(polled == 999)
-    return 999;
+    trip_motion();
+
+  polled = ants(red,orange,250,5);  
+  if(polled == 999)
+    trip_motion();
+
+  polled = ants(orange,yellow,250,5);  
+  if(polled == 999)
+    trip_motion();
     
-  polled = ants(blue, yellow,250,500);  
+  polled = ants(yellow,green,250,5);  
   if(polled == 999)
-    return 999;
+    trip_motion();    
     
-  polled = accel_chase(darkgreen,black,30);  
+  polled = ants(green,blue,250,5);  
   if(polled == 999)
-    return 999;  
+    trip_motion();    
+
+  polled = ants(blue,indigo,250,5);  
+  if(polled == 999)
+    trip_motion();    
+
+  polled = ants(indigo,purple,250,5);  
+  if(polled == 999)
+    trip_motion();        
+
+  polled = accel_chase(red,black,30);  
+  if(polled == 999)
+    trip_motion();  
     
   polled = randommy();
   if(polled == 999)
-    return 999;   
+    trip_motion();   
 
-  polled = chase(blue,red,20);
+  polled = chase(red,green,20);
   if(polled == 999)
-    return 999;  
+    trip_motion();  
     
-  polled = theaterChaseRainbow(50);  
-  if(polled == 999)
-    return 999;  
+  for(int i=50;i>0;i=i-5)
+  {
+    polled = theaterChaseRainbow(i);  
+    if(polled == 999)
+      trip_motion();  
+  }
     
   polled = chase_fill(black,dybim,5,6);       
   if(polled == 999)
-    return 999;
+    trip_motion();
+
+  polled = comet(black, red, 10,  1);
+  if(polled == 999)
+    trip_motion();
+
+  polled = comet(black, green, 10,  1);
+  if(polled == 999)
+    trip_motion();
+    
+  polled = comet(black, blue, 10,  1);
+  if(polled == 999)
+    trip_motion();
+    
+  polled = chase_fill(black,orange,5,5);  
+  if(polled == 999)
+    trip_motion();
+  
+  polled = fades(1,10);
+  if(polled == 999)
+    trip_motion();
+  
+  polled =  cross_the_streams(black,blue,red,10,10);
+  if(polled == 999)
+    trip_motion();
+    
+  polled = fract(white,black,500);  
+  if(polled == 999)
+    trip_motion();      
+    
+  polled = bouncy(black,dybim,10,30);
+  if(polled == 999)
+    trip_motion();
+
+  polled = earthRand(200);
+  if(polled == 999)
+    trip_motion();
+
+  polled = airRand(150);
+  if(polled == 999)
+    trip_motion();
+
+  polled = fireRand(100);
+  if(polled == 999)
+    trip_motion();
+    
+  polled = waterRand(50);
+  if(polled == 999)
+    trip_motion();
+    
+  polled = chase_fill(black,dybir,5,5); 
+  if(polled == 999)
+    trip_motion();
+    
+  polled = nchase(red,green,6,50);
+  if(polled == 999)
+    trip_motion();
+
+  polled = nchase(green,blue,6,25);
+  if(polled == 999)
+    trip_motion();
+
+  polled = nchase(blue,red,6,12);
+  if(polled == 999)
+    trip_motion();  
+
+  polled = chase_fill(red,blue,5,9);
+  if(polled == 999)
+    trip_motion();
+    
+  polled = bouncy(black,blue,10,50);
+  if(polled == 999)
+    trip_motion();
+
+  polled = rainbow(20);
+  if(polled == 999)
+    trip_motion();
+
+  polled = rainbowCycle(20);
+  if(polled == 999)
+    trip_motion();
+
+  polled = crossfader(white,black,20,true);
+  if(polled == 999)
+    trip_motion();
+
+  polled = crossfader(orangered,deepblue,20,false);
+  if(polled == 999)
+    trip_motion();
+
+  polled = fract(red,green,500);  
+  if(polled == 999)
+    trip_motion();  
+        
+  polled = omgp();
+  if(polled == 999)
+    trip_motion();
+
+  polled = chase_fill(black,red,5,7);
+  if(polled == 999)
+    trip_motion();
+    
+  polled = ants(blue, yellow,250,500);  
+  if(polled == 999)
+    trip_motion();
+    
+  polled = accel_chase(darkgreen,black,30);  
+  if(polled == 999)
+    trip_motion();  
+    
+  polled = randommy();
+  if(polled == 999)
+    trip_motion();   
+
+  polled = chase(blue,red,20);
+  if(polled == 999)
+    trip_motion();  
+    
+  polled = theaterChaseRainbow(50);  
+  if(polled == 999)
+    trip_motion();  
+    
+  polled = chase_fill(black,dybim,5,6);       
+  if(polled == 999)
+    trip_motion();
     
   return 1;
 }
 
 void bob_debug() {
-  comet(black, blue, 10, 100, 1);
+  chase_fill(black,dybir,5,5);  
 }
 
 int chase_fill(uint32_t bg, uint32_t fg, int loops, int wait)
@@ -234,7 +405,12 @@ int chase_fill(uint32_t bg, uint32_t fg, int loops, int wait)
         {
           strip.setPixelColor(i,Wheel(i * wheel_seed_multiplier));
         }else{
-          strip.setPixelColor(i,fg);
+          if(fg == dybir)
+          {
+            strip.setPixelColor(i,randomColor());
+          }else{
+            strip.setPixelColor(i,fg);
+          }
         }
         if(i>0)  
           strip.setPixelColor(i-1,bg);
@@ -254,7 +430,12 @@ int chase_fill(uint32_t bg, uint32_t fg, int loops, int wait)
         {
           strip.setPixelColor(i,Wheel(i*10));
         }else{
-          strip.setPixelColor(i,fg);
+          if(fg == dybir)
+          {
+            strip.setPixelColor(i,randomColor());
+          }else{
+            strip.setPixelColor(i,fg);
+          }
         }
         if(i<numLEDs)  
           strip.setPixelColor(i+1,bg);
@@ -269,7 +450,7 @@ int chase_fill(uint32_t bg, uint32_t fg, int loops, int wait)
   return 1;
 }
 
-int comet(uint32_t bg, uint32_t tail_color, int tail_length, int wait, int loops)
+int comet(uint32_t bg, uint32_t tail_color, int tail_length, int loops)
 {
   float tail_multiplier = .75;
   all(bg);
@@ -452,8 +633,10 @@ int bouncy(uint32_t c1, uint32_t c2, int init_wait, int loops)
 {
   int wait;
   bool dybim_flag;
+  bool dybir_flag;
   int strip_divisor = 2;
   dybim_flag = false;
+  dybir_flag = false;
   for(int i=0;i<loops;i++)
   {
     if(c2 == dybim || dybim_flag )
@@ -461,6 +644,12 @@ int bouncy(uint32_t c1, uint32_t c2, int init_wait, int loops)
       dybim_flag = true;
       c2 = Wheel(i);
     }
+    if(c2 == dybir || dybir_flag )
+    {
+      dybir_flag = true;
+      c2 = randomColor();
+    }
+    if(c2 == dybir || dybir_flag)
     all(c2);
     wait = init_wait;
     for(int j=0;j<numLEDs/strip_divisor;j++)
@@ -729,7 +918,7 @@ void trip_motion(){
   delayer = 25;
 
   //we want this to play with people as long as they're around, at 25ms, it takes 40 loops to hit a second.  If we've been dark 60 seconds, kick back out to the patterns.
-  while(t_loops<600){
+  while(t_loops<60){
     int r = digitalRead(pirr);
     int g = digitalRead(pirg);
     int b = digitalRead(pirb);
@@ -945,7 +1134,8 @@ int theaterChaseRainbow(uint8_t wait) {
           strip.setPixelColor(i+q, Wheel( (i+j) % 255));    //turn every third pixel on
         }
         strip.show();
-       
+        if(poll() == 999)
+          return 999;
         delay(wait);
        
         for (int i=0; i < numLEDs; i=i+3) {
